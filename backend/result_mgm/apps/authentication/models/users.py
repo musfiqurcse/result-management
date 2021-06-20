@@ -5,7 +5,6 @@ from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin
 )
 from django.db import models
-from ..apps.authentication.models.authorization import AppRole
 
 
 
@@ -18,24 +17,10 @@ class UserManager(BaseUserManager):
             raise TypeError('Email is not triggered')
         phone_number = '' if 'phone_number' not in kw.keys() or kw['phone_number'] is None else kw['phone_number']
 
-        user = self.model(name=name, email=self.normalize_email(email.strip().lower()), phone_number=phone_number,
-                          is_staff=True)
+        user = self.model(name=name, email=self.normalize_email(email.strip().lower()), phone_number=phone_number)
         user.set_password(password)
         user.save()
         return user
-
-    # def create_customer_user(self, user_name=None, email=None, password=None, name=None, **kw):
-    #     if name is None:
-    #         name = email
-    #     if email is None:
-    #         raise TypeError('Email is not triggered')
-    #     phone_number = '' if 'phone_number' not in kw.keys() or kw['phone_number'] is None else kw['phone_number']
-
-    #     user = self.model(name=name, email=self.normalize_email(email.strip().lower()), phone_number=phone_number,
-    #                       is_customer=True)
-    #     user.set_password(password)
-    #     user.save()
-    #     return user
 
     def create_superuser(self, username=None, email=None, password=None, name=None, **kw):
         if password is None:
@@ -44,7 +29,6 @@ class UserManager(BaseUserManager):
             name = email
         user = self.create_user(name, email, password)
         user.is_superuser = True
-        user.is_staff = True
         user.save()
         return user
 
@@ -58,7 +42,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_teacher = models.BooleanField(default=False)
     is_student = models.BooleanField(default=False)
     temporary_password_generate = models.BooleanField(default=False)
-    role = models.ManyToManyField(AppRole, related_name='user_role_list')
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
@@ -80,14 +63,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def _generate_jwt_token(self):
         dt = datetime.now() + timedelta(weeks=30)
-        if self.is_staff:
-            dt = datetime.now() + timedelta(weeks=30)
         token = jwt.encode({
             'email': self.email,
             'password': self.password,
             'exp': int(dt.strftime('%s'))
         }, settings.SECRET_KEY, algorithm='HS256')
-        return token.decode('utf-8')
+        return token
 
-    def has_permission(self, action_code: str):
-        return True
