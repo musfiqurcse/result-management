@@ -30,7 +30,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
 
     def _authenticate_credentials(self, request, token):
         try:
-            payload = jwt.decode(token, settings.SECRET_KEY)
+            payload = jwt.decode(jwt=token, key=settings.SECRET_KEY)
             user = User.objects.get(email=payload['email'], password=payload['password'], )
         except User.DoesNotExist:
             msg = 'No user matching this token was found.'
