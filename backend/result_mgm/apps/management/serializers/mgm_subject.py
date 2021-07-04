@@ -12,8 +12,10 @@ class MgmSubjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MgmSubject
-        fields = ['name',
+        fields = ['id',
+                  'name',
                   'assigned_teacher',
+                  'class_id',
                   'unique_name',
                   'is_archived',
                   ]
