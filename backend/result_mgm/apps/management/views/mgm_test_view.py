@@ -37,9 +37,9 @@ class MgmTestAPI(ModelViewSet):
     def update(self, request, id):
         try:
             if request.user and request.user.is_superuser:
-                user = request.data.get('test', {})
+                test = request.data.get('test', {})
                 get_staff = MgmTest.objects.get(id=id)
-                serializer = self.serializer_class(get_staff, data=user, partial=True)
+                serializer = self.serializer_class(get_staff, data=test, partial=True)
                 if serializer.is_valid():
                     serializer.save()
                     return Response({
@@ -60,8 +60,8 @@ class MgmTestAPI(ModelViewSet):
     def create(self, request):
         try:
             if request.user and request.user.is_superuser:
-                user = request.data.get('user', {})
-                serializer = self.serializer_class(data=user)
+                test = request.data.get('test', {})
+                serializer = self.serializer_class(data=test)
                 if serializer.is_valid():
                     serializer.save()
                     return Response({

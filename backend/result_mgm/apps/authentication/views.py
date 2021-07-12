@@ -35,6 +35,16 @@ class UserAPI(ModelViewSet):
         except Exception as ex:
             return Response({'status': False, 'output': 'No Valid User information found'}, status=status.HTTP_400_BAD_REQUEST)
 
+    def destroy(self, request, id=None):
+        try:
+            if request.user and request.user.is_superuser:
+                get_user = User.objects.get(id=id)
+                get_user.delete()
+                return Response({'status': True, 'output': "deleted user successfully."}, status=status.HTTP_200_OK)
+            return Response({'status': False, 'output': 'Please provide valid user information to access data.'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as ex:
+            return Response({'status': False, 'output': 'No Valid User information found'}, status=status.HTTP_400_BAD_REQUEST)
+
     def update(self, request, id):
         try:
             if request.user and request.user.is_superuser:

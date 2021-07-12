@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
 ]
 AUTH_USER_MODEL = "authentication.User"
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -133,4 +135,9 @@ REST_FRAMEWORK = {
     )
 
 }
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_METHODS = ('DELETE', 'GET', 'OPTIONS', 'PATCH', 'POST', 'PUT', )
+CORS_ALLOW_HEADERS = ('accept', 'accept-encoding','Authorization' ,'authorization', 'content-type', 'dnt', 'origin', 'user-agent', 'x-csrftoken','access-control-allow-headers', 'x-requested-with', 'domain' )
+FILE_UPLOAD_HANDLERS = ("django.core.files.uploadhandler.MemoryFileUploadHandler",
+                        "django.core.files.uploadhandler.TemporaryFileUploadHandler",)
 

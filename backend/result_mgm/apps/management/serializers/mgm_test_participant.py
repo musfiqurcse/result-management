@@ -13,6 +13,6 @@ class MgmTestParticipantSerializer(serializers.ModelSerializer):
     class Meta:
         model = MgmTestParticipant
         fields = ['test_id',
-                  'test_id',
+                  'pupil_id',
                   'grade'
                   ]

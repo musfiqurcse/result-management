@@ -56,7 +56,9 @@ class LoginSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=150, read_only=True)
     password = serializers.CharField(max_length=128, write_only=True)
     token = serializers.CharField(max_length=255, read_only=True)
-    phone_number = serializers.CharField(max_length=100, read_only=True, required=False)
+    is_student = serializers.BooleanField(read_only=True)
+    is_teacher = serializers.BooleanField(read_only=True)
+    is_superuser = serializers.BooleanField(read_only=True)
 
     def validate(self, data):
         email = data.get('email', None)
@@ -90,6 +92,9 @@ class LoginSerializer(serializers.Serializer):
             role = 'TEACHER'
         return {
             'email': user.email,
+            'is_superuser': user.is_superuser,
+            'is_teacher': user.is_teacher,
+            'is_student': user.is_student,
             'name': user.name,
             'role': role,
             'phone_number': user.phone_number,
