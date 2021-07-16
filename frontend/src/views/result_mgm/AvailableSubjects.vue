@@ -21,10 +21,7 @@
             <CCol sm="24" md="12">
                     <CCard>
                         <CCardHeader>
-                            <h3> Subjects </h3>
-                            <CButton color="success" @click="myModal = true" class="float-right mr-1">
-                                Add Subjects
-                            </CButton>
+                            <h3>  Available Subjects </h3>
                         </CCardHeader>
                         <CCardBody>
                             <CCol lg="12">
@@ -33,93 +30,28 @@
                                             fixed
                                             bordered
                                 >
-                                    <template #remove_details="{item, index}">
-                                        <td class="py-2">
-                                            <CButton
-                                                    color="danger"
-                                                    square
-                                                    size="md"
-                                                    @click="deleteSubjects(item, index)"
-                                            >
-                                                Remove/Archive
-                                            </CButton>
-                                        </td>
-                                    </template>
-                                    <template #header>
-                                        <CIcon name="cil-description"/> List of Subjects
+                                <template #show_details="{item, index}">
+                                    <td class="py-2">
+                                        <CButton
+                                                color="success"
+                                                square
+                                                size="sm"
+                                                @click="redirect_url(item, index)"
+                                        >
+                                            Details
+                                        </CButton>
+                                    </td>
+                                </template>
+                                <template #header>
+                                    <CIcon name="cil-description"/> List of Available Subjects
 
-                                    </template>
+                                </template>
                                 </CDataTable>
                             </CCol>
                         </CCardBody>
                     </CCard>
                 </CCol>
-                <CModal
-                title="Create a new Subject"
-                :show.sync="myModal"
-                size="xl"
-                :close-on-backdrop="false"
-        >
-            <CCol sm="24">
-                <CCard>
-                    <CCardHeader>
-                        <strong>Subject Information</strong>
-                    </CCardHeader>
-                    <CCardBody>
-                        <div>
-                            <CRow>
-                                <CCol md="12">
-                                    <CInput
-                                            key="name"
-                                            :was-validated="name.was_validated"
-                                            :is-valid="name.was_validated"
-                                            :description="name.description"
-                                            v-model="name.value"
-                                            label="Name"
-                                            placeholder="Enter Name"
-                                    />
-                                </CCol>
-                                <CCol md="12">
-                                    <CSelect
-                                        label="Class List"
-                                        :was-validated="class_id.was_validated"
-                                        :is-valid="class_id.was_validated"
-                                        :description="class_id.description"
-                                        :value.sync="class_id.value"
-                                        placeholder="Select Class"
-                                        :options="available_classes"
-                                    />
-                                </CCol>
-                                <CCol md="12">
-                                    <CSelect
-                                        label="Teacher List"
-                                        :was-validated="teacher_id.was_validated"
-                                        :is-valid="teacher_id.was_validated"
-                                        :description="teacher_id.description"
-                                        :value.sync="teacher_id.value"
-                                        placeholder="Select Teacher"
-                                        :options="available_teachers"
-                                    />
-                                </CCol>
-                            </CRow>
-
-                        </div>
-
-                    </CCardBody>
-                </CCard>
-            </CCol>
-            <template #footer>
-                <CButton @click="myModal = false" color="danger">Discard</CButton>
-                <CButton @click="submitSubjectInfo()" color="success">Submit</CButton>
-            </template>
-        </CModal>
         </CRow>
-        
-        
-
-        
-
-    
 </template>
 
 <script>
@@ -135,8 +67,8 @@
         components: { CTableWrapper },
         mounted: function(){
             this.updateSubjectInfo();
-            this.availableTeachers();
-            this.getClassList()
+            // this.availableTeachers();
+            // this.getClassList()
         },
         data: function () {
             return {
@@ -151,7 +83,7 @@
                 subjects: null,
                 table_field: ["name", "unique_name",
                 {
-                    key: 'remove_details',
+                    key: 'show_details',
                     label: '',
                     _style: 'width:1%',
                     sorter: false,

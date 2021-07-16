@@ -10,43 +10,71 @@
                 fade
                 :show="alert_success"
         >
-                Subjects Created Successfully
-            </CAlert>
-            <CAlert closeButton :show.sync="dismissCountDown" show color="danger" :show="alert_danger">
-                <strong>Error Occurred!</strong> When adding Subjects Information.
-                <p>{{ error ? error.message : ""}}</p>
-            </CAlert>
-                
+            Test Created Successfully
+        </CAlert>
+        <CAlert closeButton :show.sync="dismissCountDown" show color="danger" :show="alert_danger">
+            <strong>Error Occurred!</strong> When adding Test Information.
+            <p>{{ error ? error.message : ""}}</p>
+        </CAlert>
+                <CCard>
+                    <CCardHeader>
+                        <h3> Subject Information </h3>
+                    </CCardHeader>
+                    <CCardBody>
+                        <CCardHeader>Subject Name: <strong>{{subjects.name}}</strong></CCardHeader>
+                        <CCardBody>
+                                <p>
+                                   Is Archied:  <strong>{{subjects.is_archived}}</strong> 
+                                </p>
+                                <p>
+                                   Unique Name:  <strong>{{subjects.unique_name}}</strong> 
+                                </p>
+                            <br>
+                        </CCardBody>
+                    </CCardBody>
+                </CCard>
             </CCol>
             <CCol sm="24" md="12">
                     <CCard>
                         <CCardHeader>
-                            <h3> Subjects </h3>
-                            <CButton color="success" @click="myModal = true" class="float-right mr-1">
-                                Add Subjects
+                            <h3> Tests </h3>
+                            <CButton v-if="subjects.is_archived === false" color="success" @click="myModal = true" class="float-right mr-1">
+                                Add Tests
                             </CButton>
                         </CCardHeader>
                         <CCardBody>
                             <CCol lg="12">
-                                <CDataTable :items="subjects" :fields=table_field
+                                <CDataTable :items="tests" :fields=table_field
                                             striped
                                             fixed
                                             bordered
                                 >
+                                <template #show_details="{item, index}">
+                                    <td class="py-2">
+                                        <CButton
+                                                color="success"
+                                                square
+                                                size="sm"
+                                                @click="redirect_url(item, index)"
+                                        >
+                                            Details
+                                        </CButton>
+                                    </td>
+                                </template>
                                     <template #remove_details="{item, index}">
                                         <td class="py-2">
                                             <CButton
                                                     color="danger"
                                                     square
-                                                    size="md"
-                                                    @click="deleteSubjects(item, index)"
+                                                    size="sm"
+                                                    @click="deleteTest(item, index)"
                                             >
-                                                Remove/Archive
+                                                Remove
                                             </CButton>
                                         </td>
                                     </template>
                                     <template #header>
-                                        <CIcon name="cil-description"/> List of Subjects
+                                        <CIcon name="cil-description"/> List of Tests
 
                                     </template>
                                 </CDataTable>
@@ -55,7 +83,7 @@
                     </CCard>
                 </CCol>
                 <CModal
-                title="Create a new Subject"
+                title="Create a new Test"
                 :show.sync="myModal"
                 size="xl"
                 :close-on-backdrop="false"
@@ -63,7 +91,7 @@
             <CCol sm="24">
                 <CCard>
                     <CCardHeader>
-                        <strong>Subject Information</strong>
+                        <strong>Test Information</strong>
                     </CCardHeader>
                     <CCardBody>
                         <div>
@@ -75,30 +103,23 @@
                                             :is-valid="name.was_validated"
                                             :description="name.description"
                                             v-model="name.value"
-                                            label="Name"
-                                            placeholder="Enter Name"
+                                            label="Test Name"
+                                            placeholder="Enter test name"
                                     />
                                 </CCol>
+                            </CRow>
+
+                            <CRow>
                                 <CCol md="12">
-                                    <CSelect
-                                        label="Class List"
-                                        :was-validated="class_id.was_validated"
-                                        :is-valid="class_id.was_validated"
-                                        :description="class_id.description"
-                                        :value.sync="class_id.value"
-                                        placeholder="Select Class"
-                                        :options="available_classes"
-                                    />
-                                </CCol>
-                                <CCol md="12">
-                                    <CSelect
-                                        label="Teacher List"
-                                        :was-validated="teacher_id.was_validated"
-                                        :is-valid="teacher_id.was_validated"
-                                        :description="teacher_id.description"
-                                        :value.sync="teacher_id.value"
-                                        placeholder="Select Teacher"
-                                        :options="available_teachers"
+                                    <CInput
+                                            type="date"
+                                            key="test_date"
+                                            :was-validated="test_date.was_validated"
+                                            :is-valid="test_date.was_validated"
+                                            :description="test_date.description"
+                                            v-model="test_date.value"
+                                            label="Test date"
+                                            placeholder="Enter test date"
                                     />
                                 </CCol>
                             </CRow>
@@ -110,7 +131,7 @@
             </CCol>
             <template #footer>
                 <CButton @click="myModal = false" color="danger">Discard</CButton>
-                <CButton @click="submitSubjectInfo()" color="success">Submit</CButton>
+                <CButton @click="submitTestInfo()" color="success">Submit</CButton>
             </template>
         </CModal>
         </CRow>
@@ -130,13 +151,11 @@
     import CTableWrapper from '../base/Table.vue'
     window.axios = require('axios')
     export default {
-        props: ['classes_props'],
-        name: 'Classes',
+        props: ['subjects_props'],
+        name: 'Subject',
         components: { CTableWrapper },
         mounted: function(){
             this.updateSubjectInfo();
-            this.availableTeachers();
-            this.getClassList()
         },
         data: function () {
             return {
@@ -147,9 +166,17 @@
                 alert_danger: false,
                 isCollapsed: true,
                 keyRefresh: 0,
-                classes: this.classes_props,
-                subjects: null,
-                table_field: ["name", "unique_name",
+                subjects: this.subjects_props,
+                tests: null,
+                table_field: ["name", 
+
+                {
+                    key: 'show_details',
+                    label: '',
+                    _style: 'width:1%',
+                    sorter: false,
+                    filter: false
+                },
                 {
                     key: 'remove_details',
                     label: '',
@@ -158,25 +185,17 @@
                     filter: false
                 }
                 ],
-                teacher_id: {
-                    value: null,
-                    description: null,
-                    was_validated: null,
-                },
                 name: {
                     value: null,
                     description: null,
                     was_validated: null,
                 },
-
-                class_id: {
+                test_date: {
                     value: null,
                     description: null,
                     was_validated: null,
                 },
-                available_teachers: [],
-
-                available_classes: [],
+                available_tests: [],
                 is_superuser: false,
                 is_teacher: false,
                 is_student: false,
@@ -196,44 +215,45 @@
                 const config = {
                     headers: { Authorization: `Bearer ${token}` }
                 };
-                axios.get(`http://localhost:8000/api/v1/subject/`,config).then(function(response){
+                axios.get(`http://localhost:8000/api/v1/subject/${field.$route.params.id}/`,config).then(function(response){
                         field.subjects = response.data.output
+                        field.tests = response.data.output.tests
                     }
                 ).catch(error => this.subjects = {
                     'error': 'Error Occurred'
                 })
             },
 
-            availableTeachers:  function(){
+            availablePupils:  function(){
                 const field = this
                 const token = this.token
                 const config = {
                     headers: { Authorization: `Bearer ${token}` }
                 };
-                axios.get(`http://localhost:8000/api/v1/subject/${field.$route.params.id}/available-teacher/`,config).then(function(response){
-                        let teacher_array = []
+                axios.get(`http://localhost:8000/api/v1/class/${field.$route.params.id}/available-pupil/`,config).then(function(response){
+                        let student_array = []
                         for(let i = 0; response.data.output.length > i; i+=1){
-                            teacher_array.push({ value: response.data.output[i]['id'].toString(), label: response.data.output[i]['name'] })
+                            student_array.push({ value: response.data.output[i]['id'].toString(), label: response.data.output[i]['name'] })
                         }
-                        console.log(teacher_array)
-                        field.available_teachers = teacher_array
+                        console.log(student_array)
+                        field.available_tests = student_array
                     }
-                ).catch(error => this.available_teachers = {
+                ).catch(error => this.available_tests = {
                     'error': 'Error Occurred'
                 })
             },
             redirect_url: function (item, index) {
                 console.log(index)
                 console.log(item)
-                this.$router.push({ path: `details/${item.id}`})
+                this.$router.push({ path: `/test/details/${item.id}`})
             },
-            deleteSubjects: function(item, index){
+            deleteTest: function(item, index){
                 const field = this
                 const token = this.token
                 const config = {
                     headers: { Authorization: `Bearer ${token}` }
                 };
-                axios.delete(`http://localhost:8000/api/v1/subject/${item.id}/`,config).then(function(response){
+                axios.delete(`http://localhost:8000/api/v1/test/${item.id}/`,config).then(function(response){
                         alert(response.data.output)
                         field.updateSubjectInfo();
                     }
@@ -241,28 +261,7 @@
                     'error': 'Error Occurred'
                 })
             },
-            getClassList: function(){
-                
-                const field = this
-                const token = this.token
-                const config = {
-                    headers: { Authorization: `Bearer ${token}` }
-                };
-                axios.get('http://localhost:8000/api/v1/class/',config).then(function(response){
-                        let class_array = []
-                        for(let i = 0; response.data.output.length > i; i+=1){
-                            if(response.data.output[i]['is_archived'] === false){
-                                class_array.push({ value: response.data.output[i]['id'].toString(), label: response.data.output[i]['name']+"-"+response.data.output[i]['unique_name'] })
-                            }
-                        }
-                        console.log(class_array)
-                        field.available_classes = class_array
-                    }
-                ).catch(error => this.available_classes = {
-                    'error': 'Error Occurred'
-                })
-            },
-            submitSubjectInfo: function(){
+            submitTestInfo: function(){
                 let config = {
                         headers: {
                         'Authorization': 'Bearer ' + this.token
@@ -271,11 +270,12 @@
                 const fields = this
                 fields.success = null
                 fields.error = null
-                axios.post(`http://localhost:8000/api/v1/subject/`, {
-                    subject: {
+                console.log(fields.name.value)
+                axios.post(`http://localhost:8000/api/v1/test/`, {
+                    test: {
+                        subject_id: fields.$route.params.id,
                         name: fields.name.value,
-                        assigned_teacher: fields.teacher_id.value,
-                        class_id: fields.class_id.value
+                        test_date: fields.test_date.value
                     }
                 }, config ).then(function(response){
                     fields.success = response.data
@@ -288,17 +288,12 @@
 
                     fields.name.value =  ''
 
-                    fields.teacher_id.was_validated = null
 
-                    fields.teacher_id.description =  ''
+                    fields.test_date.was_validated = null
 
-                    fields.teacher_id.value =  ''
+                    fields.test_date.description =  ''
 
-                    fields.class_id.was_validated = null
-
-                    fields.class_id.description =  ''
-
-                    fields.class_id.value =  ''
+                    fields.test_date.value =  ''
                     fields.keyRefresh +=1;
                     fields.updateSubjectInfo();
                     console.log('====SUCCES===')
@@ -306,9 +301,14 @@
                     if(error.response !== undefined){
                     console.log(error.response)
                     fields.error = error.data.message;
-                    if(fields.error.hasOwnProperty('student_id')){
-                        fields.student_id.was_validated = false
-                        fields.student_id.description = 'Please provide a valid student'
+                    if(fields.error.hasOwnProperty('test_date')){
+                        fields.test_date.was_validated = false
+                        fields.test_date.description = 'Please provide a valid test date'
+                    }
+
+                    if(fields.error.hasOwnProperty('name')){
+                        fields.name.was_validated = false
+                        fields.name.description = 'Please provide a valid name'
                     }
                     }
                     else{

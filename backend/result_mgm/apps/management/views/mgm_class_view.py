@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
 from ..models.mgm_class import MgmClass
+from result_mgm.apps.authentication.serializers.users import RegistrationUserSerializer
 from result_mgm.apps.management.serializers.mgm_class import MgmClassSerializer
 from result_mgm.apps.authentication.models.users import User
 # Create your views here.
@@ -27,10 +28,32 @@ class MgmClassAPI(ModelViewSet):
     def retrieve(self, request, id=None):
         try:
             if request.user and request.user.is_superuser:
-                return Response({'status': True, 'output': MgmClassSerializer(MgmClass.objects.get(id=id),many=False).data}, status=status.HTTP_200_OK)
+                class_info = MgmClass.objects.get(id=id)
+                results = MgmClassSerializer(class_info,many=False).data
+                results["assigned_students"] = []
+                if class_info.assigned_pupil.count() > 0:
+                    results["assigned_students"] = RegistrationUserSerializer(class_info.assigned_pupil.all(), many=True).data
+                return Response({'status': True, 'output': results}, status=status.HTTP_200_OK)
             return Response({'status': False, 'output': 'Please provide valid user information to access data.'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as ex:
             return Response({'status': False, 'output': 'No Valid Class information found'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+    def destroy(self, request, id=None):
+        try:
+            if request.user and request.user.is_superuser:
+                classes = MgmClass.objects.get(id=id, is_archived=False)
+                if classes.mgm_class_subject_ids.count() > 0:
+                    classes.is_archived = True
+                    return Response({'status': True, 'output': "Class archived Successfully"}, status=status.HTTP_200_OK)
+                else:
+                    classes.delete()
+                    return Response({'status': True, 'output': "Class deleted Successfully"}, status=status.HTTP_200_OK)
+            return Response({'status': False, 'output': 'Please provide valid user information to access data.'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as ex:
+            return Response({'status': False, 'output': 'No Valid Class information found'}, status=status.HTTP_400_BAD_REQUEST)
+
 
     def update(self, request, id):
         try:
@@ -77,6 +100,22 @@ class MgmClassAPI(ModelViewSet):
         except Exception as ex:
             return Response({'status': False, 'output': 'No Valid Class information found'}, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(methods=['get'],
+            detail=True,
+            url_path='available-pupil',
+            url_name='available-pupil')
+    def available_pupil(self, request, id):
+        try:
+            if request.user and request.user.is_superuser:
+                class_data = request.data.get('class', {})
+                get_class = MgmClass.objects.get(id=id, is_archived=False)
+                pupil_info = User.objects.filter(is_student=True).exclude(id__in=get_class.assigned_pupil.all())
+                return Response({
+                    'result': 'success',
+                    "output": RegistrationUserSerializer(pupil_info, many=True).data
+                }, status=status.HTTP_200_OK)
+        except Exception as ex:
+            return Response({'status': False, 'output': 'No Valid Class information found'}, status=status.HTTP_400_BAD_REQUEST)
 
 
     @action(methods=['put'],

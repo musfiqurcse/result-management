@@ -2,7 +2,7 @@
   <CFooter :fixed="false">
     <div>
       <a href="https://coreui.io" target="_blank">TU Chemnitz</a>
-      <span class="ml-1">&copy; {{new Date().getFullYear()}} Customized with Love by <a href="https://musfiqurcse.xyz">Musfiqur Rahman</a>.</span>
+      <!-- <span class="ml-1">&copy; {{new Date().getFullYear()}} Customized with Love by <a href="https://musfiqurcse.xyz">Musfiqur Rahman</a>.</span> -->
     </div>
 <!--    <div class="ml-auto">-->
 <!--      <span class="mr-1">Powered by</span>-->

@@ -12,7 +12,8 @@ class MgmTestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MgmTest
-        fields = ['name',
+        fields = ['id','name',
                   'subject_id',
+                  'is_archived',
                   'test_date'
                   ]

@@ -13,6 +13,7 @@
             <strong>Error Occurred!</strong> When Creating User Information.
             <p>{{ error ? error.message : ""}}</p>
         </CAlert>
+
         <CRow>
             <CCol sm="24" md="12">
                 <CCard>
@@ -63,6 +64,7 @@
                 </CCard>
             </CCol>
         </CRow>
+
         <CModal
                 title="Create a new User"
                 :show.sync="myModal"
@@ -141,7 +143,7 @@
                                         :description="role.description"
                                         v-model="role.value"
                                         placeholder="Enter role"
-                                        :options="[('admin', 'Admin'),('teacher','Teacher'),('student','Student')]"
+                                        :options="role_list"
                                     />
                                 </CCol>
                             </CRow>
@@ -180,6 +182,7 @@
                 dismissCountDown: 5,
                 token: Vue.$cookies.get('token'),
                 show: true,
+                role_list: [{ value: "admin", label: "Admin" },{ value: "teacher", label: "Teacher" },{ value: "student", label: "Student" }],
                 alert_success: false,
                 alert_danger: false,
                 isCollapsed: true,
@@ -290,10 +293,12 @@
                 const fields = this
                 fields.success = null
                 fields.error = null
-                if(fields.role.value === 'admin'){
+                console.log(fields.role)
+                debugger
+                if(fields.role.value.target.value === 'admin'){
                     fields.is_superuser = true
                 }
-                else if(fields.role.value === 'teacher') {
+                else if(fields.role.value.target.value === 'teacher') {
                     fields.is_teacher = true
                 }
                 else {
@@ -332,7 +337,7 @@
                     fields.email.value =  ''
                     fields.password.value =  ''
                     fields.username.value =  ''
-                    fields.role.value =  ''
+                    // fields.role =  null
 
                     fields.is_student = false
                     fields.is_teacher = false

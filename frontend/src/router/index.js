@@ -7,7 +7,14 @@ const TheContainer = () => import('@/containers/TheContainer')
 // ProxyProviderContainer
 const UserList = () => import('@/views/result_mgm/UserList')
 const ProfileView = () => import('@/views/result_mgm/Profile')
+const ClassListView = () => import('@/views/result_mgm/ClassList')
+const SubjectListView = () => import('@/views/result_mgm/SubjectList')
+const MyResult = () => import('@/views/result_mgm/MyResult')
+const AvailableSubjectsTeacherView = () => import('@/views/result_mgm/AvailableSubjects')
 const UserDetails = () => import('@/views/result_mgm/UserDetails')
+const ClassDetails = () => import('@/views/result_mgm/ClassDetails')
+const SubjectDetails = () => import('@/views/result_mgm/SubjectDetails')
+const TestDetails = () => import('@/views/result_mgm/TestDetails')
 const ProxyProviderDetails = () => import('@/views/result_mgm/TestParticipant')
 const FunctionalityTestDetailsView = () => import('@/views/result_mgm/FunctionalityTestDetailsView')
 // const TestUrlList = () => import('@/views/result_mgm/TestUrlList')
@@ -423,6 +430,13 @@ function configRoutes () {
         },
 
         {
+          path: 'my-result',
+          name: 'My Result',
+          component: MyResult
+        },
+
+
+        {
           path: 'profile',
           name: 'Profile',
           component: ProfileView
@@ -431,6 +445,84 @@ function configRoutes () {
           path: '/functional-details/:id',
           name: 'Functionality Test Details',
           component: FunctionalityTestDetailsView
+        },
+        {
+          path: '/classes',
+          redirect: '/classes/list',
+          name: 'Classes List',
+          component: {
+            render(c) {
+              return c('router-view')
+            }
+          },
+          children: [
+            {
+              path: 'list',
+              name: 'Classes List View',
+              component: ClassListView
+            },
+
+            {
+              path: 'details/:id',
+              name: 'Classes Details',
+              component: ClassDetails
+            },
+
+          ]
+        },
+
+        {
+          path: '/test',
+          redirect: '/test/list',
+          name: 'Test List',
+          component: {
+            render(c) {
+              return c('router-view')
+            }
+          },
+          children: [
+            {
+              path: 'list',
+              name: 'Test List View',
+              component: ClassListView
+            },
+
+            {
+              path: 'details/:id',
+              name: 'Test Details',
+              component: TestDetails
+            },
+
+          ]
+        },
+        {
+          path: '/subjects',
+          redirect: '/subjects/list',
+          name: 'Subjects List',
+          component: {
+            render(c) {
+              return c('router-view')
+            }
+          },
+          children: [
+            {
+              path: 'list',
+              name: 'Subjects List View',
+              component: SubjectListView
+            },
+            
+            {
+              path: 'available-subjects',
+              name: 'Teacher available Subjects',
+              component: AvailableSubjectsTeacherView
+            },
+            {
+              path: 'details/:id',
+              name: 'Subjects Details',
+              component: SubjectDetails
+            },
+
+          ]
         },
         {
           path: '/users',

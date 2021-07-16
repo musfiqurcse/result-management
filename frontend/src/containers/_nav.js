@@ -275,20 +275,14 @@ const superuser_new_data = [
       },
       {
         _name: 'CSidebarNavItem',
+        name: 'Class',
+        to: '/classes/list',
+        icon: 'cil-spreadsheet'
+      },
+      {
+        _name: 'CSidebarNavItem',
         name: 'Subjects',
         to: '/subjects/list',
-        icon: 'cil-spreadsheet'
-      },
-      {
-        _name: 'CSidebarNavItem',
-        name: 'Class List',
-        to: '/users/list',
-        icon: 'cil-spreadsheet'
-      },
-      {
-        _name: 'CSidebarNavItem',
-        name: 'Test List',
-        to: '/tests/list',
         icon: 'cil-spreadsheet'
       }
     ]
@@ -305,14 +299,8 @@ const student_new_data = [
       },
       {
         _name: 'CSidebarNavItem',
-        name: 'User List',
-        to: '/user/list',
-        icon: 'cil-spreadsheet'
-      },
-      {
-        _name: 'CSidebarNavItem',
-        name: 'Test-Result',
-        to: '/test-test/',
+        name: 'My-Results',
+        to: '/my-result/',
         icon: 'cil-spreadsheet'
       },
     ]
@@ -330,23 +318,10 @@ const teacher_new_data = [
       },
       {
         _name: 'CSidebarNavItem',
-        name: 'User List',
-        to: '/user/list',
+        name: 'Available Subjects',
+        to: '/subjects/available-subjects',
         icon: 'cil-spreadsheet'
-      },
-      {
-        _name: 'CSidebarNavItem',
-        name: 'Test List',
-        to: '/test/',
-        icon: 'cil-spreadsheet'
-      },
-
-      {
-        _name: 'CSidebarNavItem',
-        name: 'Class List',
-        to: '/class/',
-        icon: 'cil-spreadsheet'
-      },
+      }
     ]
   }
 ]
